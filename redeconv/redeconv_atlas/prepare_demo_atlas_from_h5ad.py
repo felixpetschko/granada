@@ -110,6 +110,11 @@ def main() -> None:
     )
     parser.add_argument("--cell-type-col", default=None, help="obs column for cell type (auto if omitted)")
     parser.add_argument("--sample-col", default=None, help="obs column for sample ID (auto if omitted)")
+    parser.add_argument(
+        "--sample-original-col",
+        default=None,
+        help="obs column to preserve as Sample_ID_original in output metadata (auto if omitted)",
+    )
     parser.add_argument("--min-cells-per-type", type=int, default=300, help="Minimum cells per cell type to keep")
     parser.add_argument("--max-cell-types", type=int, default=10, help="Maximum number of cell types to keep")
     parser.add_argument(
@@ -146,11 +151,26 @@ def main() -> None:
         ["sample", "sample_original", "sampleID", "Sample", "batch", "dataset"],
         atlas.obs.columns,
     )
+    sample_original_col = args.sample_original_col or _pick_col(
+        ["sample_original", "sample", "sampleID", "Sample", "dataset", "batch"],
+        atlas.obs.columns,
+    )
     if not cell_col or not sample_col:
-        raise ValueError(f"Could not resolve columns. cell_col={cell_col}, sample_col={sample_col}")
+        raise ValueError(
+            f"Could not resolve columns. cell_col={cell_col}, sample_col={sample_col}, sample_original_col={sample_original_col}"
+        )
 
-    obs = atlas.obs[[cell_col, sample_col]].copy()
-    obs.columns = ["Cell_type", "Sample_ID"]
+    cols = [cell_col, sample_col]
+    if sample_original_col and sample_original_col not in cols:
+        cols.append(sample_original_col)
+    obs = atlas.obs[cols].copy()
+    rename_map = {cell_col: "Cell_type", sample_col: "Sample_ID"}
+    if sample_original_col:
+        rename_map[sample_original_col] = "Sample_ID_original"
+    obs = obs.rename(columns=rename_map)
+    if "Sample_ID_original" not in obs.columns:
+        # Fallback: preserve selected sample ID if no separate original column is available.
+        obs["Sample_ID_original"] = obs["Sample_ID"]
     obs.index = obs.index.astype(str)
     obs = obs.dropna()
 
@@ -176,7 +196,7 @@ def main() -> None:
     selected = pd.Index(selected)
     meta = obs.loc[selected].copy()
     meta["Cell_ID"] = meta.index.astype(str)
-    meta = meta[["Cell_ID", "Cell_type", "Sample_ID"]]
+    meta = meta[["Cell_ID", "Cell_type", "Sample_ID", "Sample_ID_original"]]
 
     print(f"Selected cells: {meta.shape[0]} | genes: {atlas.n_vars}")
 
@@ -224,6 +244,7 @@ def main() -> None:
             [
                 f"Prepared from: {h5ad_path}",
                 f"Selected obs columns: Cell_type <- {cell_col}, Sample_ID <- {sample_col}",
+                f"Preserved original sample column: Sample_ID_original <- {sample_original_col if sample_original_col else sample_col}",
                 f"Cells selected: {meta.shape[0]}",
                 f"Genes selected: {sub.n_vars}",
                 "Normalization input:",
