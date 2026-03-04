@@ -13,6 +13,8 @@ Outputs under <out_dir>:
 from __future__ import annotations
 
 import argparse
+import os
+import shutil
 from pathlib import Path
 from typing import Iterable, List
 
@@ -169,7 +171,8 @@ def main() -> None:
     expr_norm = norm_dir / "Demo_ATLAS_scRNAseq.tsv"
     print("Writing normalization input files...")
     meta.to_csv(meta_norm, sep="\t", index=False)
-    expr.to_csv(expr_norm, sep="\t", index=False)
+    # Compact float formatting reduces file size and write time for large matrices.
+    expr.to_csv(expr_norm, sep="\t", index=False, float_format="%.6g")
 
     # Deconvolution inputs
     meta_ref = deconv_dir / "References_Meta_data_subset.tsv"
@@ -177,7 +180,15 @@ def main() -> None:
     bulk_out = deconv_dir / "Synthetic_Bulk_RNA_seq_Equal_Fraction_TPM.tsv"
     print("Writing deconvolution reference files...")
     meta.to_csv(meta_ref, sep="\t", index=False)
-    expr.to_csv(expr_ref, sep="\t", index=False)
+    # Reuse the large expression TSV instead of writing it twice.
+    if expr_ref.exists():
+        expr_ref.unlink()
+    try:
+        os.link(expr_norm, expr_ref)
+        print("Linked reference expression TSV to normalization TSV (hardlink).")
+    except OSError:
+        shutil.copyfile(expr_norm, expr_ref)
+        print("Hardlink unavailable; copied expression TSV for reference input.")
     _make_synthetic_bulk(expr.set_index("Gene_sample"), meta, bulk_out, n_bulk=args.n_bulk, seed=args.seed)
 
     readme = out_root / "README.txt"
