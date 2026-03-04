@@ -7,7 +7,7 @@ Created on Wed Mar  8 15:42:42 2023
 import time
 
 
-from __ReDeconv_N import *
+from redeconv.__ReDeconv_N import *
 
 
 #Note: How to run this script. -------------------------------------------
