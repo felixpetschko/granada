@@ -74,6 +74,28 @@ def _make_synthetic_bulk(
     bulk.to_csv(out_path, sep="\t", index=False)
 
 
+def _write_tsv_chunked(df: pd.DataFrame, out_path: Path, chunk_rows: int = 1000) -> None:
+    n_rows = df.shape[0]
+    if n_rows == 0:
+        df.to_csv(out_path, sep="\t", index=False)
+        return
+
+    n_chunks = (n_rows + chunk_rows - 1) // chunk_rows
+    first = True
+    for start in tqdm(range(0, n_rows, chunk_rows), desc="Writing expression TSV", unit="chunk", total=n_chunks):
+        end = min(start + chunk_rows, n_rows)
+        chunk = df.iloc[start:end]
+        chunk.to_csv(
+            out_path,
+            sep="\t",
+            index=False,
+            mode="w" if first else "a",
+            header=first,
+            float_format="%.6g",
+        )
+        first = False
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Create ReDeconv atlas demo TSVs from merged_annotated.h5ad")
     parser.add_argument(
@@ -97,6 +119,12 @@ def main() -> None:
         help="Cap cells sampled per (Sample_ID, Cell_type)",
     )
     parser.add_argument("--n-bulk", type=int, default=20, help="Number of synthetic bulk samples to generate")
+    parser.add_argument(
+        "--write-chunk-rows",
+        type=int,
+        default=1000,
+        help="Rows per chunk when writing large expression TSVs",
+    )
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     args = parser.parse_args()
 
@@ -171,8 +199,7 @@ def main() -> None:
     expr_norm = norm_dir / "Demo_ATLAS_scRNAseq.tsv"
     print("Writing normalization input files...")
     meta.to_csv(meta_norm, sep="\t", index=False)
-    # Compact float formatting reduces file size and write time for large matrices.
-    expr.to_csv(expr_norm, sep="\t", index=False, float_format="%.6g")
+    _write_tsv_chunked(expr, expr_norm, chunk_rows=args.write_chunk_rows)
 
     # Deconvolution inputs
     meta_ref = deconv_dir / "References_Meta_data_subset.tsv"
