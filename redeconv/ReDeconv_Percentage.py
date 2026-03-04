@@ -8,7 +8,7 @@ Created on Fri Jan 27 14:27:43 2023
 import time
 
 
-from __ReDeconv_P import *
+from redeconv.__ReDeconv_P import *
 
 #Note: How to run this script. -------------------------------------------
 # 1. create a folder, such as "ReDeconv".
