@@ -1,0 +1,32 @@
+
+0	Arunachalam	4	['Arunachalam', 'BioResourceCollaboration', 'Heimlich', 'Lee']
+	B cells	Erythrocytes	Monocytes	NK cells	Neutrophils	Platelet	T cells CD4 conv	T cells CD8	Tregs	mDC
+	480	44	480	480	1	451	480	480	456	417
+
+1	BioResourceCollaboration	6	['Arunachalam', 'BioResourceCollaboration', 'DominguezConde', 'Lee', 'SchulteSchrepping', 'TabulaSapiens']
+	B cells	Erythrocytes	Monocytes	NK cells	Neutrophils	Platelet	T cells CD4 conv	T cells CD8	Tregs	mDC
+	720	161	720	720	122	614	720	720	696	646
+
+2	DominguezConde	5	['BioResourceCollaboration', 'DominguezConde', 'Lee', 'SchulteSchrepping', 'TabulaSapiens']
+	B cells	Erythrocytes	Monocytes	NK cells	Neutrophils	Platelet	T cells CD4 conv	T cells CD8	Tregs	mDC
+	600	160	600	600	122	494	600	600	576	526
+
+3	Hao	1	['Hao']
+	B cells	Erythrocytes	Monocytes	NK cells	Neutrophils	Platelet	T cells CD4 conv	T cells CD8	Tregs	mDC
+	120	0	120	120	0	120	120	120	120	120
+
+4	Heimlich	3	['Arunachalam', 'Heimlich', 'Lee']
+	B cells	Erythrocytes	Monocytes	NK cells	Neutrophils	Platelet	T cells CD4 conv	T cells CD8	Tregs	mDC
+	360	41	360	360	0	331	360	360	336	297
+
+5	Lee	5	['Arunachalam', 'BioResourceCollaboration', 'DominguezConde', 'Heimlich', 'Lee']
+	B cells	Erythrocytes	Monocytes	NK cells	Neutrophils	Platelet	T cells CD4 conv	T cells CD8	Tregs	mDC
+	600	44	600	600	2	465	600	600	576	479
+
+6	SchulteSchrepping	4	['BioResourceCollaboration', 'DominguezConde', 'SchulteSchrepping', 'TabulaSapiens']
+	B cells	Erythrocytes	Monocytes	NK cells	Neutrophils	Platelet	T cells CD4 conv	T cells CD8	Tregs	mDC
+	480	123	480	480	122	374	480	480	480	406
+
+7	TabulaSapiens	4	['BioResourceCollaboration', 'DominguezConde', 'SchulteSchrepping', 'TabulaSapiens']
+	B cells	Erythrocytes	Monocytes	NK cells	Neutrophils	Platelet	T cells CD4 conv	T cells CD8	Tregs	mDC
+	480	123	480	480	122	374	480	480	480	406
